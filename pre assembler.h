@@ -10,6 +10,7 @@
 #define START_MACRO "%macro"
 #define END_MACRO "%endmacro"
 
+MacroList macrosList;
 
 void preAssembler()
 {
@@ -20,7 +21,6 @@ void preAssembler()
     FILE* destPtr;
 
     Pair macroRange = {-1, -1};
-    MacroList macrosList;
     int sizeOfList = 0;
     Bool flag = false;
 
@@ -69,6 +69,8 @@ void preAssembler()
 
             append(&macrosList, newDef);
             flag = true;
+            macroRange.first = -1;
+            macroRange.second = -1;
         }
         else if (macroRange.first != -1 && i > macroRange.first && macroRange.second == -1)
             flag = true;
@@ -84,11 +86,11 @@ void preAssembler()
                 // Creating an array of strings to contain the
                 // registers names (ax, bx etc.)
                 char registers[macrosList.list[macroCalledIndex].numberOfParameters][2];
+                int registerIndex = 0; // Maybe needs to be fixed.
                 for (int parameterIndex = 0;
                 parameterIndex < macrosList.list[macroCalledIndex].numberOfParameters;
                 parameterIndex++)
                 {
-                    static int registerIndex = 0; // Maybe needs to be fixed.
                     // Finding the first register index in the i(th) line in sourceFile.
                     while (parameterIndex == 0 && sourceFile[i][registerIndex] != ' ')
                         registerIndex++;
@@ -136,10 +138,6 @@ void preAssembler()
 
                     fprintf(destPtr, "%s", cpyOfLineInMarcoDefinition);
                 }
-
-
-
-
 
             }
         }
