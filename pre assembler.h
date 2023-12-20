@@ -15,11 +15,11 @@ void preAssembler()
 {
 
     int numOfLines = 0; // The number of lines in the source file
-    char** sourceFile; // The source file (.asm file)
+    char** sourceFile = NULL; // The source file (.asm file)
     FILE* srcPtr; // File pointer to open the source file.
     FILE* destPtr;
 
-    Pair macroRange;
+    Pair macroRange = {-1, -1};
     MacroList macrosList;
     int sizeOfList = 0;
     Bool flag = false;
@@ -27,10 +27,11 @@ void preAssembler()
     srcPtr = fopen("D:/Assembler project/sourceFile.asm", "r");
     destPtr = fopen("D:/Assembler project/destFile.asm", "w");
 
-    inputFile(srcPtr, sourceFile, &numOfLines);
+    inputFile(srcPtr, &sourceFile, &numOfLines);
 
     for (int i = 0; i < numOfLines; i++)
     {
+        flag = false;
         char checkMacroDef[7];
         char checkEndMacroDef[10];
 
@@ -44,11 +45,12 @@ void preAssembler()
         {
             //flag = true;
             macroRange.first = i;
+            flag = true;
         }
 
         else if (strcmp(checkEndMacroDef, END_MACRO) == 0)
         {
-            // Needs to search for the number of params and add to map.
+            // Needs to search for the number of params and add to array.
             int j = 6;
             while (isDigit(*(sourceFile[macroRange.first] + j)) == false)
                 j++;
@@ -66,52 +68,83 @@ void preAssembler()
             newDef.name = name;
 
             append(&macrosList, newDef);
+            flag = true;
         }
+        else if (macroRange.first != -1 && i > macroRange.first && macroRange.second == -1)
+            flag = true;
         else
         {
-            char* suspectedMacro = findMacroName(sourceFile[i]);
+            char* suspectedMacro = NULL;
+            findMacroName(sourceFile[i], &suspectedMacro);
             int macroCalledIndex = locateMacroByName(macrosList, suspectedMacro);
             if (macroCalledIndex != -1)
             {
+                flag = true; // Flagging that this line is a macro call.
                 // Calling a macro
-                //char** registers = (char**) malloc(macrosList.list[i].numberOfParameters * sizeof(char*));
+                // Creating an array of strings to contain the
+                // registers names (ax, bx etc.)
                 char registers[macrosList.list[macroCalledIndex].numberOfParameters][2];
-                for (int j = 0; j < macrosList.list[macroCalledIndex].numberOfParameters; j++)
+                for (int parameterIndex = 0;
+                parameterIndex < macrosList.list[macroCalledIndex].numberOfParameters;
+                parameterIndex++)
                 {
-                    static int k = 0; // Maybe needs to be fixed.
-                    while (j==0 && sourceFile[i][k] != ' ') k++;
-                    k++;
-                    registers[j][0] = sourceFile[i][k];
-                    registers[j][1] = sourceFile[i][k++];
-                    k += 3;
-                }
-                int cntParameters = 1;
+                    static int registerIndex = 0; // Maybe needs to be fixed.
+                    // Finding the first register index in the i(th) line in sourceFile.
+                    while (parameterIndex == 0 && sourceFile[i][registerIndex] != ' ')
+                        registerIndex++;
+                    // Now sourceFile[i][registerIndex] == ' ' so I'll increase it again by 1
+                    if (sourceFile[i][registerIndex] == ' ')
+                        registerIndex++;
+                    // Found register. Now storing the name of it in the array
+                    registers[parameterIndex][0] = sourceFile[i][registerIndex];
+                    registerIndex++;
+                    registers[parameterIndex][1] = sourceFile[i][registerIndex];
+                    // List of registers looks like:
+                    // ax, bl, ch, ... Now registerIndex is on the last letter of the register
+                    // so registerIndex + 1 == ',', registersIndex + 2 == ' '
+                    // and registersIndex + 3 = first letter of next register.
 
-                char arg[2];
-                arg[0] = '%';
-                for (; cntParameters <= macrosList.list[macroCalledIndex].numberOfParameters;
-                       cntParameters++)
+                    registerIndex += 3;
+                }
+                // Replacing the %1, %2, ... with the registers names.
+                int cntParameters = 0;
+                char argument[3];
+                char numberOfParameter = '1';
+                argument[0] = '%';
+                char* ptr;
+                char cpyOfLineInMarcoDefinition[200];
+
+                for (int lineNumberInMacroDefinition = macrosList.list[macroCalledIndex].range.first; lineNumberInMacroDefinition <=
+                                                                                                      macrosList.list[macroCalledIndex].range.second; lineNumberInMacroDefinition++)
                 {
-                    for (int j = macrosList.list[macroCalledIndex].range.first; j <
-                                                                                macrosList.list[macroCalledIndex].range.second; j++)
+                    numberOfParameter = '0';
+                    strcpy(cpyOfLineInMarcoDefinition, sourceFile[lineNumberInMacroDefinition]);
+                    for (cntParameters = 0; cntParameters < macrosList.list[macroCalledIndex].numberOfParameters;
+                           cntParameters++)
                     {
-                        char num = (char) (cntParameters + '0');
-                        char* ptr = strstr(sourceFile[j], strcat(arg, &num));
+                        numberOfParameter = (char)((int)numberOfParameter + 1) ;
+                        argument[1] = numberOfParameter;
+                        argument[2] = '\0';
+                        ptr = strstr(cpyOfLineInMarcoDefinition, argument);
                         if (ptr != NULL)
                         {
-                            *ptr = registers[cntParameters - 1][0];
+                            *ptr = registers[cntParameters][0];
                             ++ptr;
-                            *ptr = registers[cntParameters - 1][0];
+                            *ptr = registers[cntParameters][1];
                         }
-
                     }
-                }
-            }
-            else
-                continue;
-        }
-        fprintf(destPtr, "%s", sourceFile[i]);
 
+                    fprintf(destPtr, "%s", cpyOfLineInMarcoDefinition);
+                }
+
+
+
+
+
+            }
+        }
+        if (!flag)
+            fprintf(destPtr, "%s", sourceFile[i]);
     }
 
 

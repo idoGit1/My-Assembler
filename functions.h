@@ -31,7 +31,7 @@ char* findName(char* line) // Finding name of the macro while declaring it
     return name;
 }
 
-void inputFile(FILE* fptr, char** sourceFile, int* numOfLines)
+void inputFile(FILE* fptr, char*** sourceFile, int* numOfLines)
 {
     char tmpLine[200];
     int num = 0;
@@ -39,14 +39,14 @@ void inputFile(FILE* fptr, char** sourceFile, int* numOfLines)
         // in the source file.
         num++;
     // Sizing the matrix to be in size [number of lines]x200 (chars per line)
-    sourceFile = malloc(num * sizeof(char*));
+    *sourceFile = (char**) malloc(num * sizeof(char*));
     for (int i = 0; i < num; ++i)
-        *(sourceFile + i) = malloc(200 * sizeof(char));
+        *(*sourceFile + i) = (char*) malloc(200 * sizeof(char));
 
 
     fptr = fopen("D:/Assembler project/sourceFile.asm", "r");
     for (int i = 0; i < num; i++)
-        fgets(sourceFile[i], 200, fptr);
+        fgets((*sourceFile)[i], 200, fptr);
     // Input file is done. The source file is located in sourceFile.
     *numOfLines = num;
 }
@@ -64,20 +64,22 @@ void append(MacroList* list, Macro newElement)
     list->size++;
 }
 
-char* findMacroName(char* line) // Finding name of the macro while calling it
+void findMacroName(char* line, char** suspectedMacro) // Finding name of the macro while calling it
 {
     int i = 0;
     char name[20];
-    while (line[i] != ' ')
+    while (line[i] != ' ' && line[i] != '\0')
     {
         name[i] = line[i];
         i++;
     }
     name[i] = '\0';
-    return name;
+    *suspectedMacro = (char*) malloc(i * sizeof(char));
+    strncpy(*suspectedMacro, name, i + 1);
 }
 
-int locateMacroByName(MacroList list, char* name)
+int locateMacroByName(MacroList list, char* name) // Finding the index of the named
+// macro in the list of macros.
 {
     for (int i = 0; i < list.size; i++)
     {

@@ -9,7 +9,7 @@
 #include "pre assembler.h"
 int main()
 {
-    pre_assembler(); // Spreading macros.
+    preAssembler(); // Spreading macros.
 
     return 0;
 }
