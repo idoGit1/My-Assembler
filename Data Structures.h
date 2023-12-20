@@ -15,7 +15,7 @@ typedef struct Pair Pair;
 struct Macro
 {
     char* name;
-    int number_of_parameters;
+    int numberOfParameters;
     Pair range;
 };
 typedef struct Macro Macro;
