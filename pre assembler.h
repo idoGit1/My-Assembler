@@ -12,7 +12,7 @@
 
 MacroList macrosList;
 
-void preAssembler()
+void preAssembler(char* fileName)
 {
 
     int numOfLines = 0; // The number of lines in the source file
@@ -24,8 +24,8 @@ void preAssembler()
     int sizeOfList = 0;
     Bool flag = false;
 
-    srcPtr = fopen("D:/Assembler project/sourceFile.asm", "r");
-    destPtr = fopen("D:/Assembler project/destFile.asm", "w");
+    srcPtr = fopen(fileName, "r");
+    destPtr = fopen("D:/Assembler project/preAssembled.asm", "w");
 
     inputFile(srcPtr, &sourceFile, &numOfLines);
 

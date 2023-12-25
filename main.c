@@ -7,9 +7,9 @@
 #include <stdlib.h>
 #endif
 #include "pre assembler.h"
-int main()
+int main(int argc, char* argv[])
 {
-    preAssembler(); // Spreading macros.
+    preAssembler(argv[1]); // Spreading macros.
 
     return 0;
 }
