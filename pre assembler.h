@@ -25,7 +25,7 @@ void preAssembler(char* fileName)
     Bool flag = false;
 
     srcPtr = fopen(fileName, "r");
-    destPtr = fopen("D:/Assembler project/preAssembled.asm", "w");
+    destPtr = fopen("preAssembled.asm", "w");
 
     inputFile(srcPtr, &sourceFile, &numOfLines);
 

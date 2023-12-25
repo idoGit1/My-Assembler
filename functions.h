@@ -57,8 +57,6 @@ void append(MacroList* list, Macro newElement)
     int size = list->size;
 
     list->list = (Macro*) realloc(list->list, (size + 1) * sizeof(Macro));
-    if (list->list == NULL)
-        exit(3);
     list->list[size].name = newElement.name;
     list->list[size].numberOfParameters = newElement.numberOfParameters;
     list->list[size].range = newElement.range;
