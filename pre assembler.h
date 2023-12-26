@@ -21,8 +21,7 @@ void preAssembler(char* fileName)
     FILE* destPtr;
 
     Pair macroRange = {-1, -1};
-    int sizeOfList = 0;
-    Bool flag = false;
+    Bool flag;
 
     srcPtr = fopen(fileName, "r");
     destPtr = fopen("preAssembled.asm", "w");
@@ -109,9 +108,9 @@ void preAssembler(char* fileName)
                     registerIndex += 3;
                 }
                 // Replacing the %1, %2, ... with the registers names.
-                int cntParameters = 0;
+                int cntParameters;
                 char argument[3];
-                char numberOfParameter = '1';
+                char numberOfParameter;
                 argument[0] = '%';
                 char* ptr;
                 char cpyOfLineInMarcoDefinition[200];
@@ -146,8 +145,7 @@ void preAssembler(char* fileName)
     }
 
 
-
-    free(macrosList.list); // Need to write free all memory function.
+    freeAllMemory(&macrosList);
 }
 
 

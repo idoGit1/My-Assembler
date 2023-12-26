@@ -13,7 +13,7 @@ Bool isDigit(char c)
     return (c >= '0') && (c <= '9') ? true : false;
 }
 
-char* findName(char* line) // Finding name of the macro while declaring it
+char* findName(const char* line) // Finding name of the macro while declaring it
 {
     int i = 7;
     int cnt = 1;
@@ -57,13 +57,18 @@ void append(MacroList* list, Macro newElement)
     int size = list->size;
 
     list->list = (Macro*) realloc(list->list, (size + 1) * sizeof(Macro));
+    if (list->list == NULL)
+    {
+        printf("Error, program will terminate");
+        exit(1);
+    }
     list->list[size].name = newElement.name;
     list->list[size].numberOfParameters = newElement.numberOfParameters;
     list->list[size].range = newElement.range;
     list->size++;
 }
 
-void findMacroName(char* line, char** suspectedMacro) // Finding name of the macro while calling it
+void findMacroName(const char* line, char** suspectedMacro) // Finding name of the macro while calling it
 {
     int i = 0;
     char name[20];
@@ -86,6 +91,15 @@ int locateMacroByName(MacroList list, char* name) // Finding the index of the na
             return i;
     }
     return -1;
+}
+
+void freeAllMemory(MacroList* list)
+{
+    for (int i = 0; i < list->size; i++)
+    {
+        free(list->list[i].name);
+    }
+    free(list->list);
 }
 
 #endif //ASSEMBLER_PROJECT_FUNCTIONS_H
