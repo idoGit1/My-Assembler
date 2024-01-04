@@ -12,7 +12,18 @@
 
 MacroList macrosList;
 
+// Functions declarations:
+void spreadMacros(char*);
+void spreadLabels();
+
+
 void preAssembler(char* fileName)
+{
+    spreadMacros(fileName);
+    spreadLabels();
+}
+
+void spreadMacros(char* fileName)
 {
 
     int numOfLines = 0; // The number of lines in the source file
@@ -22,11 +33,11 @@ void preAssembler(char* fileName)
 
     Pair macroRange = {-1, -1};
     Bool flag;
+    srcPtr = fopen("D:/Assembler project/sourceFile.asm", "r");// Debugging line
+    //srcPtr = fopen(fileName, "r");
+    destPtr = fopen("D:/Assembler project/preAssembled.asm", "w");
 
-    srcPtr = fopen(fileName, "r");
-    destPtr = fopen("preAssembled.asm", "w");
-
-    inputFile(srcPtr, &sourceFile, &numOfLines);
+    inputFile(srcPtr, &sourceFile, &numOfLines, fileName);
 
     for (int i = 0; i < numOfLines; i++)
     {
@@ -127,11 +138,12 @@ void preAssembler(char* fileName)
                         argument[1] = numberOfParameter;
                         argument[2] = '\0';
                         ptr = strstr(cpyOfLineInMarcoDefinition, argument);
-                        if (ptr != NULL)
-                        {
+                        while (ptr != NULL)
+                        { 
                             *ptr = registers[cntParameters][0];
                             ++ptr;
                             *ptr = registers[cntParameters][1];
+                            ptr = strstr(cpyOfLineInMarcoDefinition, argument);
                         }
                     }
 
@@ -148,5 +160,10 @@ void preAssembler(char* fileName)
     freeAllMemory(&macrosList);
 }
 
+void spreadLabels()
+{
+    FILE* fptr = fopen("D:/Assembler project/preAssembled.asm", "w");
+    
+}
 
 #endif //ASSEMBLER_PROJECT_PRE_ASSEMBLER_H

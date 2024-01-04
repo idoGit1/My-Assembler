@@ -31,7 +31,7 @@ char* findName(const char* line) // Finding name of the macro while declaring it
     return name;
 }
 
-void inputFile(FILE* fptr, char*** sourceFile, int* numOfLines)
+void inputFile(FILE* fptr, char*** sourceFile, int* numOfLines, char* fileName)
 {
     char tmpLine[200];
     int num = 0;
@@ -44,7 +44,7 @@ void inputFile(FILE* fptr, char*** sourceFile, int* numOfLines)
         *(*sourceFile + i) = (char*) malloc(200 * sizeof(char));
 
 
-    fptr = fopen("D:/Assembler project/sourceFile.asm", "r");
+    fptr = fopen(fileName, "r");
     for (int i = 0; i < num; i++)
         fgets((*sourceFile)[i], 200, fptr);
     // Input file is done. The source file is located in sourceFile.
