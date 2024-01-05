@@ -102,4 +102,22 @@ void freeAllMemory(MacroList* list)
     free(list->list);
 }
 
-#endif //ASSEMBLER_PROJECT_FUNCTIONS_H
+char* findLabelNameBackwords(char* line, char* ptrToEndOfLabel)
+{
+    char* labelName[200];
+    int lengthOfName = 1;
+    char* ptrToBeginOfLabel = ptrToEndOfLabel - 1;
+    while (line != ptrToBeginOfLabel)
+    {
+        lengthOfName++;
+        --ptrToBeginOfLabel;
+    }
+    // Now ptrToEndOfLabel points to the beginning of the label, so 
+    // changing the name:
+    strncpy(labelName, ptrToBeginOfLabel, lengthOfName);
+    labelName[lengthOfName] = '\0';
+    return labelName;
+}
+
+
+#endif ASSEMBLER_PROJECT_FUNCTIONS_H

@@ -163,7 +163,27 @@ void spreadMacros(char* fileName)
 void spreadLabels()
 {
     FILE* fptr = fopen("D:/Assembler project/preAssembled.asm", "w");
-    
+    char currentLine[200];
+    char* ptrToEndOfLabel;
+    char** labelTable = (char**) malloc(1 * sizeof(char[200]));
+    int* labelLineNumber;
+    int labelCounter = 0;
+    while (fgets(currentLine, 200, fptr))
+    {
+        ptrToEndOfLabel = strstr(currentLine, ':');
+        if (ptrToEndOfLabel != NULL) 
+        {
+            // Find the name of the label, labels looks like
+            // "nameOfLabel": so first we look after the ':' and then we find 
+            // the name of the label and add it to the table.
+            labelTable[labelCounter] = findLabelNameBackwords(currentLine, ptrToEndOfLabel);
+            labelCounter++;
+            labelTable = (char**) realloc(labelTable, (labelCounter + 1) * sizeof(char[200]));
+        }
+    }
+    // Need to go over the file again and write jmp lableLineNumber[i]
+    // instead of "lableName".
+
 }
 
 #endif //ASSEMBLER_PROJECT_PRE_ASSEMBLER_H
