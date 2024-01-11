@@ -104,7 +104,7 @@ void freeAllMemory(MacroList* list)
 
 char* findLabelNameBackwords(char* line, char* ptrToEndOfLabel)
 {
-    char* labelName[200];
+    char* labelName = (char*) malloc(200 * sizeof(char));
     int lengthOfName = 1;
     char* ptrToBeginOfLabel = ptrToEndOfLabel - 1;
     while (line != ptrToBeginOfLabel)
@@ -120,4 +120,4 @@ char* findLabelNameBackwords(char* line, char* ptrToEndOfLabel)
 }
 
 
-#endif ASSEMBLER_PROJECT_FUNCTIONS_H
+#endif //ASSEMBLER_PROJECT_FUNCTIONS_H

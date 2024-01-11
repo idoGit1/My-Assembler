@@ -162,15 +162,16 @@ void spreadMacros(char* fileName)
 
 void spreadLabels()
 {
-    FILE* fptr = fopen("D:/Assembler project/preAssembled.asm", "w");
+    FILE* fptr = fopen("D:/Assembler project/preAssembled.asm", "r");
     char currentLine[200];
     char* ptrToEndOfLabel;
     char** labelTable = (char**) malloc(1 * sizeof(char[200]));
-    int* labelLineNumber;
+    int* labelLineNumber = (int*) malloc(1 * sizeof(int));
     int labelCounter = 0;
+    int lineCounter = 0;
     while (fgets(currentLine, 200, fptr))
     {
-        ptrToEndOfLabel = strstr(currentLine, ':');
+        ptrToEndOfLabel = strstr(currentLine, ":");
         if (ptrToEndOfLabel != NULL) 
         {
             // Find the name of the label, labels looks like
@@ -179,6 +180,25 @@ void spreadLabels()
             labelTable[labelCounter] = findLabelNameBackwords(currentLine, ptrToEndOfLabel);
             labelCounter++;
             labelTable = (char**) realloc(labelTable, (labelCounter + 1) * sizeof(char[200]));
+            labelLineNumber[labelCounter] = lineCounter;
+            labelLineNumber = (int*) realloc(labelLineNumber, (labelCounter + 1) * sizeof(int));
+        }
+        lineCounter++;
+    }
+    fptr = fopen("D:/Assembler project/preAssembled.asm", "w");
+    while (fgets(currentLine, 200, fptr))
+    {
+        for (int i = 0; i < labelCounter; i++)
+        {
+            if (strncmp(currentLine + 4, labelTable[i], strlen(labelTable[i]))
+            == 0)
+            {
+                fprintf(fptr, "jmp %#02x", labelLineNumber[i]);
+            }
+            else if (strstr(currentLine, ":") == NULL)
+                fprintf(fptr, "");
+            else
+            fprintf(fptr, currentLine);
         }
     }
     // Need to go over the file again and write jmp lableLineNumber[i]
