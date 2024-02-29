@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdlib> // For dynamic memory allocation
 #include <cstring> // For string manipulation
+#include <cstdio>
 
 //#include "functions.h"
 #include "Data Structures.h" 
@@ -15,29 +16,44 @@ std::vector<Macro> macrosList;
 
 void spreadMacros(const std::string& fileName);
 void spreadLabels();
-void removeBlankLines();
+void removeBlankLines(const std::string&);
 void preAssembler(const std::string& fileName) 
 {
     spreadMacros(fileName);
-    removeBlankLines();
+    removeBlankLines("macrosSpreaded.asm");
     spreadLabels();
 }
 
 
-void removeBlankLines()
+void removeBlankLines(const std::string& fileName)
 {
-    std::ifstream srcPtr("D:/Assembler project/preAssembled.asm");
-    std::ofstream destPtr("D:/Assembler project/preAssembled.asm");
+    std::ifstream srcPtr(fileName);
+    std::ofstream destPtr("blankLinesRemoved.asm");
 
     std::string line;
 
     while (std::getline(srcPtr, line))
     {
-        if (line != "\n")
+        if (line != "")
             destPtr << line << "\n";
         else
             continue;
     }
+    srcPtr.close();
+    destPtr.close();
+    try
+    {
+        char name[] = "macrosSpreaded.asm";
+        if (remove(name) == 0)
+            std::cout << "macroSpreaded removed succesfully";
+        else
+            throw 1;
+    }
+    catch (int prob)
+    {
+        std::cerr << "Probelm " << prob;
+    }
+    
 }
 
 void spreadMacros(const std::string& fileName) 
@@ -45,8 +61,8 @@ void spreadMacros(const std::string& fileName)
     std::vector<std::string>sourceFile;
     std::string line;
     
-    std::ifstream srcPtr("D:/Assembler project/sourceFile.asm");
-    std::ofstream destPtr("D:/Assembler project/preAssembled.asm");
+    std::ifstream srcPtr(fileName);
+    std::ofstream destPtr("macrosSpreaded.asm");
 
     std::pair<int, int> macroRange = { -1, -1 };
     bool flag;
@@ -175,16 +191,17 @@ void spreadMacros(const std::string& fileName)
                             cpyOfLineInMarcoDefinition[ptr] = registers[cntParameters][1];
                             ptr = cpyOfLineInMarcoDefinition.find(argument);
                         }
+                        argument = "%";
                     }
 
-                    destPtr << cpyOfLineInMarcoDefinition;
+                    destPtr << cpyOfLineInMarcoDefinition << "\n";
                 }
 
             }
         }
 print:
         if (!flag)
-            destPtr << sourceFile[i];
+            destPtr << sourceFile[i] << "\n";
     }
     // Cleaning processes
     srcPtr.close();
@@ -192,9 +209,9 @@ print:
 }
 
 void spreadLabels() 
-   {
-    std::ifstream file("preAssembled.asm"); // Open pre-assembled file for reading
-    std::ofstream outputFile("preAssembled_tmp.asm"); // Open temporary file for writing
+{
+    std::ifstream file("blankLinesRemoved.asm"); // Open pre-assembled file for reading
+    std::ofstream outputFile("preAssembled.asm"); // Open temporary file for writing
 
     std::vector<std::string> labelTable;
     std::vector<int> labelLineNumber;
@@ -247,6 +264,19 @@ void spreadLabels()
 
     file.close(); // Close file
     outputFile.close(); // Close output file
+
+
+    try
+    {
+        if (remove("blankLinesRemoved.asm") == 0)
+            std::cout << "blankLinesRemoved removed succesfully";
+        else
+            throw;
+    }
+    catch (...)
+    {
+        throw;
+    }
 
     // Rename temporary file to original file
     //std::rename("preAssembled_tmp.asm", "preAssembled.asm");
